@@ -14,8 +14,13 @@ jobs:
     outputs:
       e2e_should_run: ${{ steps.changes.outputs.e2e_should_run }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Detect changes
@@ -80,8 +85,13 @@ jobs:
     name: Integration Tests (${{ matrix.type.name }})
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the chainlink-ccip repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Determine Go version
         id: go_version
         run: echo "GO_VERSION=$(cat go.mod |grep "^go"|cut -d' ' -f 2)" >> $GITHUB_ENV
@@ -93,7 +103,7 @@ jobs:
         run: go version
       - name: Fetch latest pull request data
         id: fetch_pr_data
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         # only run this step if the event is a pull request or merge_group
         if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         with:
@@ -167,7 +177,7 @@ jobs:
             echo "::set-output name=ref::$default"
           fi
       - name: Clone Chainlink repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           repository: smartcontractkit/chainlink
           ref: ${{ steps.get_chainlink_sha.outputs.ref }}
@@ -225,6 +235,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [integration-test-matrix]
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Fail the job if ccip tests in PR not successful
         if: always() && needs.integration-test-matrix.result == 'failure'
         run: exit 1

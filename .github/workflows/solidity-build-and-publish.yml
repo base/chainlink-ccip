@@ -17,8 +17,13 @@ jobs:
     outputs:
       changes: ${{ steps.ch.outputs.changes }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Detect changes
@@ -42,7 +47,12 @@ jobs:
       release-version-ccip: ${{ steps.release-tag-check.outputs.release-version }}
       pre-release-version-ccip: ${{ steps.release-tag-check.outputs.pre-release-version }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Check release tag
@@ -61,8 +71,13 @@ jobs:
     name: Native Compilation
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
 
@@ -114,8 +129,13 @@ jobs:
     name: Solidity Lint
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Setup NodeJS
@@ -137,8 +157,13 @@ jobs:
     if: needs.tag-check.outputs.is-pre-release-ccip == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
 
@@ -180,7 +205,7 @@ jobs:
           pnpm version "${version}" --no-git-tag-version --no-commit-hooks --no-git-checks
 
       - name: Publish to NPM (beta)
-        uses: smartcontractkit/.github/actions/ci-publish-npm@ci-publish-npm/v1
+        uses: smartcontractkit/.github/actions/ci-publish-npm@d1d6e79d9f514385c9dc7c300e06977df16df77c # ci-publish-npm/v1
         with:
           create-github-release: false
           publish-command: "pnpm publish-beta --no-git-checks"
@@ -196,8 +221,13 @@ jobs:
     if: needs.tag-check.outputs.is-release-ccip == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
 
@@ -242,7 +272,7 @@ jobs:
           fi
 
       - name: Publish to NPM (latest)
-        uses: smartcontractkit/.github/actions/ci-publish-npm@ci-publish-npm/v1
+        uses: smartcontractkit/.github/actions/ci-publish-npm@d1d6e79d9f514385c9dc7c300e06977df16df77c # ci-publish-npm/v1
         with:
           create-github-release: true
           publish-command: "pnpm publish-prod --no-git-checks"

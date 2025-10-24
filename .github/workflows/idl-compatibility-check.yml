@@ -14,6 +14,9 @@ on:
       - "chains/solana/contracts/target/idl/rmn_remote.json"
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
+permissions:
+  contents: read
+
 jobs:
   check-idl-changes:
     runs-on: ubuntu-latest
@@ -21,14 +24,19 @@ jobs:
       pull-requests: write
       contents: read
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           fetch-depth: 0
 
       - name: Check for bypass label
         id: check-bypass
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
             const { data: labels } = await github.rest.issues.listLabelsOnIssue({
@@ -62,7 +70,7 @@ jobs:
 
       - name: Comment on PR
         if: steps.check-bypass.outputs.result != 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
             const changedFiles = `${{ steps.changed-files.outputs.files }}`.trim().split(' ').filter(Boolean);
