@@ -22,6 +22,11 @@ jobs:
     outputs:
       matrix: ${{ steps.define-matrix.outputs.matrix }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Define test matrix
         id: define-matrix
         shell: bash
@@ -36,7 +41,7 @@ jobs:
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
 
@@ -52,8 +57,13 @@ jobs:
       not_test_sol_modified_files: ${{ steps.changes-non-test.outputs.not_test_sol_files }}
       all_changes: ${{ steps.changes.outputs.changes }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Detect changes
@@ -110,12 +120,17 @@ jobs:
     # The if statements for steps after checkout repo is workaround for
     # passing required check for PRs that don't have filtered changes.
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
         if:
           ${{ contains(fromJson(needs.changes.outputs.all_changes), matrix.product.name)
           || contains(fromJson(needs.changes.outputs.all_changes), 'shared')
           || needs.changes.outputs.non_src_changes == 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
           submodules: recursive
@@ -290,6 +305,11 @@ jobs:
     name: Check Foundry Tests Results
     runs-on: ubuntu-22.04
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Check tests statuses and fail if any of them failed or were cancelled
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: |
@@ -307,9 +327,14 @@ jobs:
         product: ${{fromJson(needs.define-matrix.outputs.matrix)}}
     runs-on: ubuntu-22.04
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
         if: ${{ (contains(fromJson(needs.changes.outputs.all_changes), matrix.product.name) || needs.changes.outputs.non_src_changes == 'true')}}
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
           submodules: recursive
@@ -341,6 +366,11 @@ jobs:
     name: Check Foundry Format Results
     runs-on: ubuntu-22.04
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Check format statuses and fail if any of them failed or were cancelled
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: |

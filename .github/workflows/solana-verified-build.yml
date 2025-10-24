@@ -18,8 +18,13 @@ jobs:
     outputs:
       solana_changes: ${{ steps.changes.outputs.solana_changes }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
       - name: Detect changes
@@ -37,7 +42,12 @@ jobs:
     if: ${{ needs.changes.outputs.solana_changes == 'true' }}
     runs-on: ubuntu-latest-8cores-32GB
     steps:
-    - uses: actions/checkout@v4
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         fetch-depth: 0
     - name: Get Long and Short SHAs
@@ -46,7 +56,7 @@ jobs:
         FULL_SHA=$(git rev-parse ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.sha || github.sha }})
         echo "short_sha=${FULL_SHA:0:12}" >> $GITHUB_OUTPUT
         echo "full_sha=$FULL_SHA" >> $GITHUB_OUTPUT
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         ref: ${{ steps.get_sha.outputs.full_sha }}
         fetch-depth: 0
@@ -56,7 +66,7 @@ jobs:
         cargo install solana-verify@0.4.6
     - name: Cache cargo target dir
       id: cache-target
-      uses: actions/cache@v4 # v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: chains/solana/contracts/target/deploy/*.so
         key: ${{ runner.os }}-solana-contract-verified-${{ hashFiles('chains/solana/contracts/**/*.rs', 'chains/solana/contracts/**/Cargo.lock') }}
